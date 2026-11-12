@@ -1,5 +1,6 @@
 package com.medpro.medpro.model.entity;
 
+import com.medpro.medpro.model.dto.DadosAtualizacaoPaciente;
 import com.medpro.medpro.model.dto.DadosCadastroPaciente;
 
 import jakarta.persistence.Embedded;
@@ -21,6 +22,7 @@ public class Paciente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private boolean ativo;
     private String nome;
     private String email;
     private String cpf;
@@ -30,10 +32,30 @@ public class Paciente {
     private Endereco endereco;
     
     public Paciente(DadosCadastroPaciente dados) {
+        this.ativo = true;
         this.nome = dados.nome();
         this.email = dados.email();
         this.cpf = dados.cpf();
         this.telefone = dados.telefone();
         this.endereco = new Endereco(dados.endereco());
+    }
+
+    public void atualizarInformacoes(DadosAtualizacaoPaciente dados) {
+        if (dados.nome() != null) {
+            if(dados.nome().isBlank())
+                throw new IllegalArgumentException("Nome não pode estar em branco");
+            this.nome = dados.nome();
+        }
+        if (dados.telefone() != null) {
+            if(dados.telefone().isBlank())
+                throw new IllegalArgumentException("Telefone não pode estar em branco");
+            this.telefone = dados.telefone();
+        }
+        if (dados.endereco() != null) {
+            this.endereco.atualizarInformacoes(dados.endereco());
+        }
+    }
+    public void excluir() {
+        this.ativo = false;
     }
 }
